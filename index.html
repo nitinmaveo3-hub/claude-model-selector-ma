@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Claude Model Selector</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 600px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      padding: 24px;
+      max-height: 95vh;
+      overflow-y: auto;
+    }
+
+    @media (min-width: 768px) {
+      .container {
+        padding: 40px;
+      }
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 8px;
+      color: #333;
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 24px;
+      }
+    }
+
+    .subtitle {
+      color: #666;
+      margin-bottom: 24px;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: #333;
+      font-size: 14px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 120px;
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 14px;
+      resize: vertical;
+      transition: border-color 0.2s;
+      -webkit-appearance: none;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      -webkit-appearance: none;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .results {
+      margin-top: 24px;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      display: none;
+    }
+
+    .results.show {
+      display: block;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .result-item {
+      margin-bottom: 16px;
+    }
+
+    .result-label {
+      font-weight: 600;
+      color: #333;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .result-value {
+      font-size: 20px;
+      color: #667eea;
+      font-weight: 700;
+    }
+
+    .reasoning {
+      margin-top: 16px;
+      padding: 12px;
+      background: white;
+      border-left: 3px solid #667eea;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #555;
+      line-height: 1.5;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      color: #667eea;
+      font-size: 14px;
+      padding: 20px;
+    }
+
+    .loading.show {
+      display: block;
+    }
+
+    .footer {
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid #e0e0e0;
+      text-align: center;
+      font-size: 12px;
+      color: #999;
+    }
+
+    .models-info {
+      margin-top: 12px;
+      padding: 8px;
+      background: #f0f0f0;
+      border-radius: 4px;
+      font-size: 11px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🚀 Claude Model Selector</h1>
+    <p class="subtitle">Paste your requirement to get AI model recommendations</p>
+
+    <div class="form-group">
+      <label for="requirement">What do you want to do?</label>
+      <textarea id="requirement" placeholder="Example: Analyze a large codebase and suggest architecture improvements..."></textarea>
+    </div>
+
+    <button onclick="analyzeRequirement()">Analyze & Recommend</button>
+
+    <div class="loading" id="loading">
+      Analyzing...
+    </div>
+
+    <div class="results" id="results">
+      <div class="result-item">
+        <div class="result-label">Recommended Model</div>
+        <div class="result-value" id="modelResult">-</div>
+      </div>
+
+      <div class="result-item">
+        <div class="result-label">Thinking Mode</div>
+        <div class="result-value" id="thinkingResult">-</div>
+      </div>
+
+      <div class="result-item" id="budgetContainer" style="display: none;">
+        <div class="result-label">Thinking Budget</div>
+        <div class="result-value" id="budgetResult">-</div>
+      </div>
+
+      <div class="reasoning" id="reasoningResult"></div>
+    </div>
+
+    <div class="footer">
+      <p>Always use the latest Claude models for best results</p>
+      <div class="models-info" id="modelsInfo">Loading available models...</div>
+    </div>
+  </div>
+
+  <script>
+    let availableModels = [];
+
+    // Load available models on startup
+    async function loadModels() {
+      try {
+        const response = await fetch('/api/models');
+        const data = await response.json();
+        availableModels = data.models || [];
+        updateModelsInfo();
+      } catch (error) {
+        console.log('Models loaded with defaults');
+        updateModelsInfo();
+      }
+    }
+
+    function updateModelsInfo() {
+      const info = document.getElementById('modelsInfo');
+      const modelNames = availableModels.length > 0
+        ? availableModels.slice(0, 3).map(m => m.name).join(', ')
+        : 'Opus, Sonnet, Haiku';
+      info.textContent = `Available: ${modelNames}${availableModels.length > 3 ? '...' : ''}`;
+    }
+
+    async function analyzeRequirement() {
+      const requirement = document.getElementById('requirement').value;
+      const resultsDiv = document.getElementById('results');
+      const loadingDiv = document.getElementById('loading');
+
+      if (!requirement.trim()) {
+        alert('Please enter a requirement first');
+        return;
+      }
+
+      loadingDiv.classList.add('show');
+      resultsDiv.classList.remove('show');
+
+      try {
+        const response = await fetch('/analyze', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ requirement })
+        });
+
+        const data = await response.json();
+
+        document.getElementById('modelResult').textContent = data.model.toUpperCase();
+
+        const thinkingText = data.thinking ? 'ON' : 'OFF';
+        document.getElementById('thinkingResult').textContent = thinkingText;
+
+        const budgetContainer = document.getElementById('budgetContainer');
+        if (data.thinking && data.budget) {
+          document.getElementById('budgetResult').textContent = data.budget.toUpperCase();
+          budgetContainer.style.display = 'block';
+        } else {
+          budgetContainer.style.display = 'none';
+        }
+
+        document.getElementById('reasoningResult').textContent = data.reasoning;
+
+        loadingDiv.classList.remove('show');
+        resultsDiv.classList.add('show');
+      } catch (error) {
+        alert('Error analyzing requirement: ' + error.message);
+        loadingDiv.classList.remove('show');
+      }
+    }
+
+    // Allow Enter key to submit
+    document.getElementById('requirement').addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.key === 'Enter') {
+        analyzeRequirement();
+      }
+    });
+
+    // Load models on page load
+    loadModels();
+  </script>
+</body>
+</html>

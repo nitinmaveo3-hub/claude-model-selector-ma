@@ -1,4 +1,4 @@
-# Claude Model Selector 🚀
+# Claude Model Selector 🚀 
 
 An intelligent AI model recommendation tool that analyzes your task requirements and suggests the optimal Claude model with the right settings.
 

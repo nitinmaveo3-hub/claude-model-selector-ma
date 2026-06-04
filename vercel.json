@@ -7,9 +7,9 @@
     }
   ],
   "routes": [
-    { "src": "/analyze", "dest": "app.js" },
-    { "src": "/api/models", "dest": "app.js" },
-    { "src": "/health", "dest": "app.js" },
-    { "src": "/(.*)", "dest": "/$1" }
+    {
+      "src": "/(.*)",
+      "dest": "app.js"
+    }
   ]
 }

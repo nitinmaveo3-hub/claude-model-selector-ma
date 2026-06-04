@@ -1,18 +1,17 @@
 const express = require('express');
 const path = require('path');
+const app = express();
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
-// Available models with their characteristics
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
+
+// Available models with their characteristics
 const MODELS = {
   opus: {
-    name: 'Opus 4.8',
-    tier: 'premium',
-    capability: 'highest',
     speed: 'slower',
     costFactor: 1.0
   },
